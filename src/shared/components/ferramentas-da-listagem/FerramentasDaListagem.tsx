@@ -1,6 +1,7 @@
-import { Box, Button, Icon, Paper, TextField, useTheme } from '@mui/material';
+import { Box, Button, Icon, InputAdornment, Paper, TextField, useTheme } from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
 
-interface IBarraDeFerramentas {
+interface IFerramentasDaListagem {
     textoDaBusca?: string;
     mostrarInputBusca?: boolean;
     aoMudarTextoDeBusca?: (novoTexto: string) => void;
@@ -9,7 +10,7 @@ interface IBarraDeFerramentas {
     aoClicarBotaoNovo?: () => void;
 }
 
-export const BarraDeFerramentas: React.FC<IBarraDeFerramentas> = ({
+export const FerramentasDaListagem: React.FC<IFerramentasDaListagem> = ({
   textoDaBusca = '',
   mostrarInputBusca = false,
   aoMudarTextoDeBusca,
@@ -37,9 +38,15 @@ export const BarraDeFerramentas: React.FC<IBarraDeFerramentas> = ({
           placeholder='Pesquisar...'
           value={textoDaBusca}
           onChange={(e) => aoMudarTextoDeBusca?.(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
         />
       )}
-      {/* Inserir icone no textfield */}
       <Box flex={1} display={'flex'} justifyContent={'end'}>
         {mostrarBotaoNovo && (
           <Button
