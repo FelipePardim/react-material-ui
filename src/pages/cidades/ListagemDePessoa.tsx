@@ -12,7 +12,14 @@ export const ListagemDePessoas: React.FC = () => {
   }, [searchParams]);
 
   useEffect(() => {
-    PessoasService.getAll();
+    PessoasService.getAll()
+      .then((result) => {
+        if (result instanceof Error) {
+          alert(result.message);
+        } else {
+          console.log(result);
+        }
+      });
   }, []);
 
   return (
