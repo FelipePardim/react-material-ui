@@ -4,13 +4,18 @@ import { LayoutBaseDePagina } from '../../shared/layouts';
 import { useEffect, useMemo, useState } from 'react';
 import { IListagemPessoa, PessoasService } from '../../shared/services/api/pessoas/PessoasService';
 import { useDebounce } from '../../shared/hooks';
-import { LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
+import { LinearProgress, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
+import { Environment } from '../../shared/environment';
 
 export const ListagemDePessoas: React.FC = () => {
   const [ searchParams, setSearchParams ] = useSearchParams();
 
   const busca = useMemo(() => {
     return searchParams.get('busca') || '';
+  }, [searchParams]);
+
+  const pagina = useMemo(() => {
+    return Number(searchParams.get('pagina') || '1');
   }, [searchParams]);
 
   const { debounce } = useDebounce();
@@ -23,7 +28,7 @@ export const ListagemDePessoas: React.FC = () => {
     setIsLoading(true);
 
     debounce(() => {
-      PessoasService.getAll(1, busca)
+      PessoasService.getAll(pagina, busca)
         .then((result) => {
           setIsLoading(false);
 
@@ -37,7 +42,7 @@ export const ListagemDePessoas: React.FC = () => {
           }
         });
     });
-  }, [busca]);
+  }, [busca, pagina]);
 
   return (
     <div>
@@ -48,7 +53,7 @@ export const ListagemDePessoas: React.FC = () => {
             mostrarInputBusca
             textoBotaoNovo='Nova'
             textoDaBusca={busca}
-            aoMudarTextoDeBusca={texto => setSearchParams({ busca: texto }, { replace: true })}
+            aoMudarTextoDeBusca={texto => setSearchParams({ busca: texto, pagina: '1' }, { replace: true })}
           />
         }>
 
@@ -62,7 +67,7 @@ export const ListagemDePessoas: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows.map(row => (
+              {!isLoading && rows.map(row => (
                 <TableRow key={row.id}>
                   <TableCell>Açoes {totalCount}</TableCell>
                   <TableCell>{row.nomeCompleto}</TableCell>
@@ -70,14 +75,30 @@ export const ListagemDePessoas: React.FC = () => {
                 </TableRow>
               ))}
             </TableBody>
+
+            {!isLoading && totalCount === 0 && (
+              <caption>{Environment.LISTAGEM_VAZIA}</caption>
+            )}
+
             <TableFooter>
-              <TableRow>
-                {isLoading && (
+              {isLoading && (
+                <TableRow>
                   <TableCell colSpan={3}>
                     <LinearProgress variant='indeterminate'/>
                   </TableCell>
-                )}
-              </TableRow>
+                </TableRow>
+              )}
+              {(totalCount > 0) && (totalCount > Environment.LIMITE_DE_LINHAS) && (
+                <TableRow>
+                  <TableCell colSpan={3}>
+                    <Pagination
+                      page={pagina}
+                      count={Math.ceil(totalCount / Environment.LIMITE_DE_LINHAS)}
+                      onChange={(e, newPage) => setSearchParams({ busca, pagina: newPage.toString() }, { replace: true })}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
             </TableFooter>
           </Table>
         </TableContainer>
