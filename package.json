@@ -34,7 +34,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "mock": "json-server --port 3333 --watch ./mock/database.json"
+    "mock": "json-server --port 3333 --watch ./mock/database.json",
+    "delay": "json-server --port 3333 --delay 2000 --watch ./mock/database.json"
   },
   "eslintConfig": {
     "extends": [
