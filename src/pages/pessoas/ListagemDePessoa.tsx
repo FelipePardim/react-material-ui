@@ -4,7 +4,7 @@ import { LayoutBaseDePagina } from '../../shared/layouts';
 import { useEffect, useMemo, useState } from 'react';
 import { IListagemPessoa, PessoasService } from '../../shared/services/api/pessoas/PessoasService';
 import { useDebounce } from '../../shared/hooks';
-import { Paper, Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
+import { LinearProgress, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow } from '@mui/material';
 
 export const ListagemDePessoas: React.FC = () => {
   const [ searchParams, setSearchParams ] = useSearchParams();
@@ -23,7 +23,7 @@ export const ListagemDePessoas: React.FC = () => {
     setIsLoading(true);
 
     debounce(() => {
-      PessoasService.getAll()
+      PessoasService.getAll(1, busca)
         .then((result) => {
           setIsLoading(false);
 
@@ -62,20 +62,23 @@ export const ListagemDePessoas: React.FC = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {isLoading === false ? rows.map(row => (
+              {rows.map(row => (
                 <TableRow key={row.id}>
                   <TableCell>Açoes {totalCount}</TableCell>
                   <TableCell>{row.nomeCompleto}</TableCell>
                   <TableCell>{row.email}</TableCell>
                 </TableRow>
-              )) : 
-                <TableRow>
-                  <TableCell><Skeleton sx={{ width: 'auto' }} /></TableCell>
-                  <TableCell><Skeleton sx={{ width: 'auto' }} /></TableCell>
-                  <TableCell><Skeleton sx={{ width: 'auto' }} /></TableCell>
-                </TableRow>
-              }
+              ))}
             </TableBody>
+            <TableFooter>
+              <TableRow>
+                {isLoading && (
+                  <TableCell colSpan={3}>
+                    <LinearProgress variant='indeterminate'/>
+                  </TableCell>
+                )}
+              </TableRow>
+            </TableFooter>
           </Table>
         </TableContainer>
       </LayoutBaseDePagina>
